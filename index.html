@@ -18,25 +18,42 @@
   <div class="container-fluid">
     <div class="row">
       <div id="city-list" class="col-md-3 bg-light">
-        <h3>Search for a City</h3>
+        <h4 class="mt-3">Search for a City:</h4>
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="City Name" aria-label="city name" aria-describedby="basic-addon2">
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+            <button class="btn btn-outline-secondary" id="city-search" type="button"><i class="fas fa-search"></i></button>
           </div>
         </div>
+
+        <table class="table table-light border">
+          <tbody>
+            <tr>
+              <td>Mark</td>
+            </tr>
+            <tr>
+              <td>Jacob</td>
+            </tr>
+            <tr>
+              <td>Larry</td>
+            </tr>
+          </tbody>
+        </table>
+              
       </div>
 
       <div class="col-md-9">
-        <div class="row">
-        <div class="card col-md-11 m-3">
-            <h3>City Name<img id="weather-icon" height="auto" width="auto"></h3>
-          <div id="forecast" class="card-body">
+        <!--<div class="row">-->
+        <div class="card col-md-12 mt-3 mb-3">
+            <!--<h3 id="city-name" class="mt-2">City Name<img id="weather-icon" height="auto" width="auto"></h3>-->
+          <div id="forecast" class="card-body pl-0 pr-0">
+            <h3 id="city-name">City Name</h3><img id="weather-icon" height="auto" width="auto">
+            <span id="temp-data"></span><br>
+            <span id="hum-data"></span><br>
+            <span id="wind-data"></span><br>
+            <span id="uvi-data"></span><br>
           </div>
-        </div>
-        <div>
 
-        </div>
         </div>
 
         <div class="row">
@@ -52,12 +69,10 @@
         <div class="col-md-2dot4">
         <div id="five-day-1" class="card bg-primary text-white">
           <div class="card-body">
-            <h5>header1</h5>
-            <img id="weather-icon" height="auto" width="auto">
-            <div class="card-text">
-              <p>temperature: 23.45&deg F</p>
-              <p>Humidity:</p>
-            </div>
+            <h6></h6>
+            <img class="weather-icon" height="auto" width="auto">
+              <p class="temp-5 small"></p>
+              <p class="hum-5 small"></p>
           </div>
         </div>
         </div>
@@ -65,9 +80,10 @@
         <div class="col-md-2dot4">
         <div id="five-day-2" class="card bg-primary text-white">
           <div class="card-body">
-            <h5>header2</h5>
-            <img id="weather-icon" height="auto" width="auto">
-            <p class="card-text">blablabla weather</p>
+            <h6></h6>
+            <img class="weather-icon" height="auto" width="auto">
+            <p class="temp-5 small"></p>
+            <p class="hum-5 small"></p>
           </div>
         </div>
         </div>
@@ -75,9 +91,10 @@
         <div class="col-md-2dot4">
           <div id="five-day-3" class="card bg-primary text-white">
             <div class="card-body">
-              <h5>header3</h5>
-              <img id="weather-icon" height="auto" width="auto">
-              <p class="card-text">blablabla weather</p>
+              <h6></h6>
+              <img class="weather-icon" height="auto" width="auto">
+              <p class="temp-5 small"></p>
+              <p class="hum-5 small"></p>
             </div>
           </div>
         </div>
@@ -85,9 +102,10 @@
         <div class="col-md-2dot4">
           <div id="five-day-4" class="card bg-primary text-white">
             <div class="card-body">
-              <h5>header4</h5>
-              <img id="weather-icon" height="auto" width="auto">
-              <p class="card-text">blablabla weather</p>
+              <h6></h6>
+              <img class="weather-icon" height="auto" width="auto">
+              <p class="temp-5 small"></p>
+              <p class="hum-5 small"></p>
             </div>
           </div>
         </div>
@@ -95,9 +113,10 @@
         <div class="col-md-2dot4">
           <div id="five-day-5" class="card bg-primary text-white">
             <div class="card-body">
-              <h5>header5</h5>
-              <img id="weather-icon" height="auto" width="auto">
-              <p class="card-text">blablabla weather</p>
+              <h6></h6>
+              <img class="weather-icon" height="auto" width="auto">
+              <p class="temp-5 small"></p>
+              <p class="hum-5 small"></p>
             </div>
           </div>
         </div>
@@ -112,7 +131,8 @@
   <footer></footer>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
   <script src="https://kit.fontawesome.com/f53a07ee43.js" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
 </body>
 </html>
