@@ -28,16 +28,16 @@
 
         <table class="table table-light border">
           <tbody>
-            <tr>
-              <td>Mark</td>
-            </tr>
-            <tr>
-              <td>Jacob</td>
-            </tr>
-            <tr>
-              <td>Larry</td>
-            </tr>
-          </tbody>
+            <tr class="border" id="row0"></tr>
+            <tr class="border" id="row1"></tr>
+            <tr class="border" id="row2"></tr>
+            <tr class="border" id="row3"></tr>
+            <tr class="border" id="row4"></tr>
+            <tr class="border" id="row5"></tr>
+            <tr class="border" id="row6"></tr>
+            <tr class="border" id="row7"></tr>
+            <tr class="border" id="row8"></tr>
+            <tr class="border" id="row9"></tr>        
         </table>
               
       </div>
@@ -47,7 +47,10 @@
         <div class="card col-md-12 mt-3 mb-3">
             <!--<h3 id="city-name" class="mt-2">City Name<img id="weather-icon" height="auto" width="auto"></h3>-->
           <div id="forecast" class="card-body pl-0 pr-0">
-            <h3 id="city-name">City Name</h3><img id="weather-icon" height="auto" width="auto">
+            <div class="row">
+              <div id="city-name" class="col-md-auto h3 navbar-text ">City Name</div>
+              <div class="col-md-2"><img id="weather-icon" height="auto" width="auto"></div>
+            </div>
             <span id="temp-data"></span><br>
             <span id="hum-data"></span><br>
             <span id="wind-data"></span><br>
@@ -67,7 +70,7 @@
         <div id="five-day-cards" class="row">
 
         <div class="col-md-2dot4">
-        <div id="five-day-1" class="card bg-primary text-white">
+        <div id="five-day-1" class="card bg-primary text-white mb-1">
           <div class="card-body">
             <h6></h6>
             <img class="weather-icon" height="auto" width="auto">
@@ -78,7 +81,7 @@
         </div>
 
         <div class="col-md-2dot4">
-        <div id="five-day-2" class="card bg-primary text-white">
+        <div id="five-day-2" class="card bg-primary text-white mb-1">
           <div class="card-body">
             <h6></h6>
             <img class="weather-icon" height="auto" width="auto">
@@ -89,7 +92,7 @@
         </div>
 
         <div class="col-md-2dot4">
-          <div id="five-day-3" class="card bg-primary text-white">
+          <div id="five-day-3" class="card bg-primary text-white mb-1">
             <div class="card-body">
               <h6></h6>
               <img class="weather-icon" height="auto" width="auto">
@@ -100,7 +103,7 @@
         </div>
 
         <div class="col-md-2dot4">
-          <div id="five-day-4" class="card bg-primary text-white">
+          <div id="five-day-4" class="card bg-primary text-white mb-1">
             <div class="card-body">
               <h6></h6>
               <img class="weather-icon" height="auto" width="auto">
@@ -111,7 +114,7 @@
         </div>
 
         <div class="col-md-2dot4">
-          <div id="five-day-5" class="card bg-primary text-white">
+          <div id="five-day-5" class="card bg-primary text-white mb-1">
             <div class="card-body">
               <h6></h6>
               <img class="weather-icon" height="auto" width="auto">
