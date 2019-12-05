@@ -21,9 +21,19 @@ let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
 $('#city-search').click(() => {
   event.preventDefault();
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
-  // VALIDATE CITY NAME AND PARSE COUNTRY CODE, IF THERE IS ONE
-  let cityQuery = 'weather?q=' + citySearchString;
+  getWeatherInformation(citySearchString);
+})
 
+$('input').keypress(event => {
+  if (event.which == 13) {
+    event.preventDefault();
+    let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
+    getWeatherInformation(citySearchString);
+  }
+})
+
+let getWeatherInformation = (citySearchString => {
+  let cityQuery = 'weather?q=' + citySearchString;
   $.ajax({
     url: weatherInfoRequestPrefix + cityQuery + apiKey,
     method: "GET",
@@ -152,11 +162,12 @@ let retrieveFromLocalStorage = (objName => {
   console.log('object', recentSearchList);
   console.lof('array', recentSearchArray);
   // return sortByLastSearch(localStorage.getItem(objName));
-  recentSearchArray.sort((a, b) {
+  recentSearchArray.sort(function(a, b) {
     return (a[1] - b[1]);
   })
   if(recentSearchArray.length > 10) {
-    // TODO: delete the last item in the array (at index 10)
+    // delete the last item in the array (at index 10)
+    recentSearchArray.splice(10, 1);
   }
   return localStorage.getItem(Object.entries(objName)); // return an array
 })
@@ -170,20 +181,21 @@ let displaySearchHistory = (searchArray => {
     console.log('each one', item)
     let buttonLocation = $(`#row${index}`);
     $(`#row${index}`).html(`<td><button class="recent${index} btn btn-link p-0 text-muted">${item[0]}</button></td>`);
-    // $(`#recent${index}`).on('click', searchAgain()); // DOES NOT WORK??
-    $(`#recent${index}`).on('click', function() {
-      searchString = $(this).text();
-      console.log("SEARCH STRING=", searchString);
-    })
+
+    $( "table" ).on( "click", "button", function( event ) {
+      event.preventDefault();
+      console.log( $(this).text() );
+      getWeatherInformation($(this).text());
+    });
     
     ++index;
   })
 })
 
-let searchAgain = (() => {
-  searchString = $(this).text();
-  console.log("SEARCH STRING=", searchString);
-})
+// let searchAgain = (() => {
+//   searchString = $(this).text();
+//   console.log("SEARCH STRING=", searchString);
+// })
 
 /*
 $("button").click(function() {
