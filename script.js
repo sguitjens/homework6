@@ -16,8 +16,17 @@ let weatherIcon = '';
 let weatherInfoRequestPrefix = 'http://api.openweathermap.org/data/2.5/';
 let fiveDayRequestPrefix = 'https://api.openweathermap.org/data/2.5/forecast?q='; // + &mode=json
 let uviQuery = 'uvi?'
-let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'                  
- 
+let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+
+$(document).ready(() => {
+  // localStorage.clear();
+  if(!localStorage.getItem('searchHistory')) {
+    initializeLocalStorage();
+  } else {
+    retrieveFromLocalStorage(searchHistory);
+  }
+})
+
 $('#city-search').click(() => {
   event.preventDefault();
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
@@ -38,7 +47,6 @@ let getWeatherInformation = (citySearchString => {
     url: weatherInfoRequestPrefix + cityQuery + apiKey,
     method: "GET",
     error: (err => {
-      console.log('ERROR WAS RETURNED', err);
       alert("Your city was not found. Check your spelling, or enter a city name with a country code, separated by a comma")
       return;
     })
@@ -99,7 +107,6 @@ let showValuesOnPage = (() => {
   $('#city-name').text(searchString + ' (' + dateString(Date.now()) + ')');
   // save "cityName + ', ' + countryCode" to local storage with the time stamp
   let result = addToSearchHistory(searchString, Date.now());
-  console.log('result of trying to add to search history', result);
   $('#weather-icon').attr('src', iconURL + iconName + '.png')
   $('#temp-data').text('Temperature: ' + 
     (tempInK - 273.15).toFixed(2) + ' ' + String.fromCharCode(176) + 'C (' +
@@ -150,23 +157,18 @@ let addToSearchHistory = ((searchString, timeStamp) => {
   return saveToLocalStorage(searchHistory);
 });
 
-let trimSearchHistory = (historyArray => {
-  // this needs to happen when the search history object is retrieved from local storage
-  // after it has been sorted by time
-})
-
 // retrieve search history from local storage, sort it and trim it
 let retrieveFromLocalStorage = (objName => {
   let recentSearchList = localStorage.getItem(objName);
-  let recentSearchArray = Object.entries(localStorage.getItem(objName));
-  console.log('object', recentSearchList);
-  console.lof('array', recentSearchArray);
+  console.log("RECENT SEARCH LIST", recentSearchList);
+  let recentSearchArray = Object.entries(recentSearchList); // FAILING HERE
+  // console.log('object', recentSearchList);
+  // console.lof('array', recentSearchArray);
   // return sortByLastSearch(localStorage.getItem(objName));
   recentSearchArray.sort(function(a, b) {
     return (a[1] - b[1]);
   })
   if(recentSearchArray.length > 10) {
-    // delete the last item in the array (at index 10)
     recentSearchArray.splice(10, 1);
   }
   return localStorage.getItem(Object.entries(objName)); // return an array
@@ -176,35 +178,21 @@ let retrieveFromLocalStorage = (objName => {
 let displaySearchHistory = (searchArray => {
   let index = 0;
 
-  console.log('sorted list', searchArray);
+  // console.log('sorted list', searchArray);
   searchArray.forEach(item => {
-    console.log('each one', item)
+    // console.log('each one', item)
     let buttonLocation = $(`#row${index}`);
     $(`#row${index}`).html(`<td><button class="recent${index} btn btn-link p-0 text-muted">${item[0]}</button></td>`);
 
     $( "table" ).on( "click", "button", function( event ) {
       event.preventDefault();
-      console.log( $(this).text() );
+      // console.log( $(this).text() );
       getWeatherInformation($(this).text());
     });
     
     ++index;
   })
 })
-
-// let searchAgain = (() => {
-//   searchString = $(this).text();
-//   console.log("SEARCH STRING=", searchString);
-// })
-
-/*
-$("button").click(function() {
-  value = $(this).siblings("textarea").val();
-  hourString = $(this).siblings("div").text();
-  
-  saveSchedule(hourString, value);
-});
-*/
 
 /* END OF LOCAL STORAGE FUNCTIONS */
 
@@ -214,17 +202,17 @@ let searchHistory = {
   'London, UK': 1575072014
 }
 
-console.log('searchHistory', searchHistory);
+// console.log('searchHistory', searchHistory);
 displaySearchHistory(Object.entries(searchHistory));
 
 /*
 1. display search history: takes a sorted array
 2. update local storage: add/update search terms in local storage (I think this is done)
-3. retrieve search history from local storage: return an array (this is done)
+3. retrieve search history from local storage: return an array (DONE)
 4. trim list: get rid of > 10 searches takes an array, updates local storate, (and returns the updated array?)
-  do this after adding the new search
-5. make onclick event for each button
-6. add a document ready function to load the data
+  do this after adding the new search (DONE? ONLOAD DOES THIS, WHAT ABOUT AFTER)
+5. make onclick event for each button (DONE)
+6. add a document ready function to load the data (DONE)
 
 convert array to object: Object.fromEntries()
 convert object to array: Object.entries()
