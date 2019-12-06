@@ -36,7 +36,7 @@ let updateSearchHistory = (() => {
     const searchHistoryArray = [];
 
     for (let [key, value] of Object.entries(searchHistoryObject)) {
-      console.log([`${key}`, `${value}`]);
+      // console.log([`${key}`, `${value}`]);
       searchHistoryArray.push([`${key}`, `${value}`]); 
     }
     console.log("SEARCH HISTORY ARRAY", searchHistoryArray);
