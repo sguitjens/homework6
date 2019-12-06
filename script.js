@@ -17,20 +17,65 @@ let weatherInfoRequestPrefix = 'https://api.openweathermap.org/data/2.5/';
 let fiveDayRequestPrefix = 'https://api.openweathermap.org/data/2.5/forecast?q='; // + &mode=json
 let uviQuery = 'uvi?'
 let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+let searchHistory = {};
 
 $(document).ready(() => {
+  console.log("DOCUMENT READY")
+  updateSearchHistory();
+})
+
+let updateSearchHistory = (() => {
   // localStorage.clear();
-  if(!localStorage.getItem('searchHistory')) {
+  const searchHistoryObject = JSON.parse(localStorage.getItem('searchHistory'));
+  console.log("searchHistoryObject", searchHistoryObject);
+  if(searchHistoryObject === null) {
+    console.log("NULL")
     initializeLocalStorage();
   } else {
-    retrieveFromLocalStorage(searchHistory);
+    console.log("SEARCH HISTORY OBJECT", searchHistoryObject);
+    const searchHistoryArray = [];
+    // console.log("ARRAY FROM OBJECT", searchHistoryArray);
+
+    for (let [key, value] of Object.entries(searchHistoryObject)) {
+      console.log([`${key}`, `${value}`]);
+      searchHistoryArray.push([`${key}`, `${value}`]); 
+    }
+    console.log("SEARCH HISTORY ARRAY", searchHistoryArray);
+    if(searchHistoryArray) {
+      displaySearchHistory(searchHistoryArray);
+    }
   }
 })
+
+// display the last ten searches
+let displaySearchHistory = (searchArray => {
+  let index = 0;
+  console.log("ARRAY FOREACH ISSUE", searchArray);
+  
+  searchArray.forEach(item => {
+    $(`#row${index}`).html(`<td><button class="recent${index} btn btn-link p-0 text-muted">${item[index]}</button></td>`);
+    $( "table" ).on( "click", "button", function( event ) {
+      event.preventDefault();
+      getWeatherInformation($(this).text());
+      console.log("INDEX", index);
+      
+      ++index;
+    })
+  })
+
+    
+})
+
+let initializeLocalStorage = (() => {
+  localStorage.setItem('searchHistory', '{}');
+  console.log('LOCAL STORAGE', localStorage.getItem(searchHistory));
+});
 
 $('#city-search').click(() => {
   event.preventDefault();
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
   getWeatherInformation(citySearchString);
+  
 })
 
 $('input').keypress(event => {
@@ -102,7 +147,7 @@ let dateString = (unixTime => {
   return moment(unixTime).format('MM/DD/YYYY');
 })
 
-let showValuesOnPage = (() => {
+let showValuesOnPage = (() => { // this updates search history display, I think
   let searchString = cityName + ', ' + countryCode;
   $('#city-name').text(searchString + ' (' + dateString(Date.now()) + ')');
   // save "cityName + ', ' + countryCode" to local storage with the time stamp
@@ -133,15 +178,13 @@ let setFiveDayData = (response => {
 
 /* LOCAL STORAE FUNCTIONS */
 
-let initializeLocalStorage = (() => {
-  localStorage.setItem('searchHistory', '{}');
-});
 
-let saveToLocalStorage = ((searchesObj) => {
+
+let saveToLocalStorage = ((searchesObj) => { // returns???
   return localStorage.setItem('searchHistory', JSON.stringify(searchesObj));
 });
 
-let addToSearchHistory = ((searchString, timeStamp) => {
+let addToSearchHistory = ((searchString, timeStamp) => { // returns the search history object
   // TODO: the search string that gets saved should be the one
   // that comes back from the service (that is displayed in the results)
   if(!localStorage.getItem('searchHistory')) {
@@ -157,53 +200,44 @@ let addToSearchHistory = ((searchString, timeStamp) => {
   return saveToLocalStorage(searchHistory);
 });
 
-// retrieve search history from local storage, sort it and trim it
-let retrieveFromLocalStorage = (objName => {
-  let recentSearchList = localStorage.getItem(objName);
-  console.log("RECENT SEARCH LIST", recentSearchList);
-  let recentSearchArray = Object.entries(recentSearchList); // FAILING HERE
-  // console.log('object', recentSearchList);
-  // console.lof('array', recentSearchArray);
+// retrieve search history from local storage, sort it, trim it, convert it into an array
+let retrieveFromLocalStorage = (localStorageObject => {
+  // let recentSearchList = localStorage.getItem(localStorageObject);// I think we can skip this and send in the getItem
+  console.log("RECENT SEARCH LIST", localStorageObject);
+  let recentSearchArray = {};
+  if(localStorageObject) {
+    recentSearchArray = Object.entries(localStorageObject);
+    recentSearchArray.sort(function(a, b) {
+      return (a[1] - b[1]);
+    })
+  }
+  // if(Object.entries(localStorageObject)) {
+  //   recentSearchArray = Object.entries(localStorageObject);
+  // }
+  console.log('object', localStorageObject);
+  console.log('array', recentSearchArray);
   // return sortByLastSearch(localStorage.getItem(objName));
-  recentSearchArray.sort(function(a, b) {
-    return (a[1] - b[1]);
-  })
+  // recentSearchArray.sort(function(a, b) {
+  //   return (a[1] - b[1]);
+  // })
   if(recentSearchArray.length > 10) {
     recentSearchArray.splice(10, 1);
   }
-  return localStorage.getItem(Object.entries(objName)); // return an array
+  return recentSearchArray; // return an array
 })
 
-// display the last ten searches
-let displaySearchHistory = (searchArray => {
-  let index = 0;
 
-  // console.log('sorted list', searchArray);
-  searchArray.forEach(item => {
-    // console.log('each one', item)
-    let buttonLocation = $(`#row${index}`);
-    $(`#row${index}`).html(`<td><button class="recent${index} btn btn-link p-0 text-muted">${item[0]}</button></td>`);
-
-    $( "table" ).on( "click", "button", function( event ) {
-      event.preventDefault();
-      // console.log( $(this).text() );
-      getWeatherInformation($(this).text());
-    });
-    
-    ++index;
-  })
-})
 
 /* END OF LOCAL STORAGE FUNCTIONS */
 
-let searchHistory = {
-  'Portland': 1575071887,
-  'Moscow, RU': 1575075000,
-  'London, UK': 1575072014
-}
+// let searchHistory = {
+//   'Portland': 1575071887,
+//   'Moscow, RU': 1575075000,
+//   'London, UK': 1575072014
+// }
 
 // console.log('searchHistory', searchHistory);
-displaySearchHistory(Object.entries(searchHistory));
+// displaySearchHistory(Object.entries(searchHistory));
 
 /*
 1. display search history: takes a sorted array
