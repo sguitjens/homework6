@@ -13,7 +13,7 @@ let uvIndex = 0;
 let iconName = ''
 let iconURL= 'https://openweathermap.org/img/wn/';
 let weatherIcon = '';
-let weatherInfoRequestPrefix = 'http://api.openweathermap.org/data/2.5/';
+let weatherInfoRequestPrefix = 'https://api.openweathermap.org/data/2.5/';
 let fiveDayRequestPrefix = 'https://api.openweathermap.org/data/2.5/forecast?q='; // + &mode=json
 let uviQuery = 'uvi?'
 let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
