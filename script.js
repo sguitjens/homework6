@@ -34,7 +34,6 @@ let updateSearchHistory = (() => {
   } else {
     console.log("SEARCH HISTORY OBJECT", searchHistoryObject);
     const searchHistoryArray = [];
-    // console.log("ARRAY FROM OBJECT", searchHistoryArray);
 
     for (let [key, value] of Object.entries(searchHistoryObject)) {
       console.log([`${key}`, `${value}`]);
@@ -43,6 +42,7 @@ let updateSearchHistory = (() => {
     console.log("SEARCH HISTORY ARRAY", searchHistoryArray);
     if(searchHistoryArray) {
       displaySearchHistory(searchHistoryArray);
+      console.log("DISPLAYING SEARCH HISTORY");
     }
   }
 })
@@ -62,8 +62,6 @@ let displaySearchHistory = (searchArray => {
       ++index;
     })
   })
-
-    
 })
 
 let initializeLocalStorage = (() => {
@@ -75,6 +73,7 @@ $('#city-search').click(() => {
   event.preventDefault();
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
   getWeatherInformation(citySearchString);
+  addToSearchHistory(citySearchString, Date.now());
   
 })
 
@@ -83,6 +82,7 @@ $('input').keypress(event => {
     event.preventDefault();
     let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
     getWeatherInformation(citySearchString);
+    addToSearchHistory(citySearchString, Date.now());
   }
 })
 
@@ -151,7 +151,7 @@ let showValuesOnPage = (() => { // this updates search history display, I think
   let searchString = cityName + ', ' + countryCode;
   $('#city-name').text(searchString + ' (' + dateString(Date.now()) + ')');
   // save "cityName + ', ' + countryCode" to local storage with the time stamp
-  let result = addToSearchHistory(searchString, Date.now());
+  addToSearchHistory(searchString, Date.now());
   $('#weather-icon').attr('src', iconURL + iconName + '.png')
   $('#temp-data').text('Temperature: ' + 
     (tempInK - 273.15).toFixed(2) + ' ' + String.fromCharCode(176) + 'C (' +
@@ -176,17 +176,11 @@ let setFiveDayData = (response => {
   }
 })
 
-/* LOCAL STORAE FUNCTIONS */
-
-
-
-let saveToLocalStorage = ((searchesObj) => { // returns???
+let saveToLocalStorage = (searchesObj => {
   return localStorage.setItem('searchHistory', JSON.stringify(searchesObj));
 });
 
-let addToSearchHistory = ((searchString, timeStamp) => { // returns the search history object
-  // TODO: the search string that gets saved should be the one
-  // that comes back from the service (that is displayed in the results)
+let addToSearchHistory = ((searchString, timeStamp) => {
   if(!localStorage.getItem('searchHistory')) {
     initializeLocalStorage();
   }
@@ -197,59 +191,5 @@ let addToSearchHistory = ((searchString, timeStamp) => { // returns the search h
   searchHistory[searchString] = timeStamp;
   console.log('search history object AFTER addition', searchHistory);
 
-  return saveToLocalStorage(searchHistory);
+  saveToLocalStorage(searchHistory);
 });
-
-// retrieve search history from local storage, sort it, trim it, convert it into an array
-let retrieveFromLocalStorage = (localStorageObject => {
-  // let recentSearchList = localStorage.getItem(localStorageObject);// I think we can skip this and send in the getItem
-  console.log("RECENT SEARCH LIST", localStorageObject);
-  let recentSearchArray = {};
-  if(localStorageObject) {
-    recentSearchArray = Object.entries(localStorageObject);
-    recentSearchArray.sort(function(a, b) {
-      return (a[1] - b[1]);
-    })
-  }
-  // if(Object.entries(localStorageObject)) {
-  //   recentSearchArray = Object.entries(localStorageObject);
-  // }
-  console.log('object', localStorageObject);
-  console.log('array', recentSearchArray);
-  // return sortByLastSearch(localStorage.getItem(objName));
-  // recentSearchArray.sort(function(a, b) {
-  //   return (a[1] - b[1]);
-  // })
-  if(recentSearchArray.length > 10) {
-    recentSearchArray.splice(10, 1);
-  }
-  return recentSearchArray; // return an array
-})
-
-
-
-/* END OF LOCAL STORAGE FUNCTIONS */
-
-// let searchHistory = {
-//   'Portland': 1575071887,
-//   'Moscow, RU': 1575075000,
-//   'London, UK': 1575072014
-// }
-
-// console.log('searchHistory', searchHistory);
-// displaySearchHistory(Object.entries(searchHistory));
-
-/*
-1. display search history: takes a sorted array
-2. update local storage: add/update search terms in local storage (I think this is done)
-3. retrieve search history from local storage: return an array (DONE)
-4. trim list: get rid of > 10 searches takes an array, updates local storate, (and returns the updated array?)
-  do this after adding the new search (DONE? ONLOAD DOES THIS, WHAT ABOUT AFTER)
-5. make onclick event for each button (DONE)
-6. add a document ready function to load the data (DONE)
-
-convert array to object: Object.fromEntries()
-convert object to array: Object.entries()
-
-add the search term to the object when the search is performed
-*/
