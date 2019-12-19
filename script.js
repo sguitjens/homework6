@@ -24,12 +24,18 @@ $(document).ready(() => {
   updateSearchHistory();
 })
 
+// TODO: fix sort order
+// TODO: fix truncation of array
+// TODO: add config.js to protect api key
+
+// gets the search history from local storage and displays its contents
+// initializes it if it doesn't exist
+// creates an array of items and calls the function to display them
 let updateSearchHistory = (() => {
   // localStorage.clear();
   const searchHistoryObject = JSON.parse(localStorage.getItem('searchHistory'));
   console.log("searchHistoryObject", searchHistoryObject);
   if(searchHistoryObject === null) {
-    console.log("NULL")
     initializeLocalStorage();
   } else {
     console.log("SEARCH HISTORY OBJECT", searchHistoryObject);
@@ -47,23 +53,50 @@ let updateSearchHistory = (() => {
   }
 })
 
-// display the last ten searches
+// display the last ten searches: I think this might be where there are problems
 let displaySearchHistory = (searchArray => {
   let index = 0;
   console.log("ARRAY FOREACH ISSUE", searchArray);
-  
-  searchArray.forEach(item => {
-    $(`#row${index}`).html(`<td><button class="recent${index} btn btn-link p-0 text-muted">${item[index]}</button></td>`);
+  // SORT HERE
+  searchArray.sort((a, b) => {
+    // console.log("a", a);
+    // console.log("b", b);
+    return a[1] + b[1];
+  })
+
+  let arrayLength = searchArray.length;
+  // TRUNCATE HERE
+  // if(arrayLength > 10) {
+    let result = ''
+  while(arrayLength > 10) {
+    console.log("ARRAY BEFORE POP", searchArray);
+    result = searchArray.pop();
+    console.log("POPPED", result);
+    console.log("ARRAY AFTER POP", searchArray);
+    arrayLength = searchArray.length;
+  }
+
+  //update in local storage?????????????????????
+  // clear local storage and put this item in instead
+  localStorage.clear();
+  let obj = Object.fromEntries(searchArray);
+  console.log("::::::::OBJECT NOW::::::::", obj);
+  localStorage.setItem(searchHistory, obj);
+
+ 
+
+  // display
+  for(let i = 0; i < arrayLength; ++i) {
+    $(`#row${i}`).html(`<td><button class="recent${i} btn btn-link p-0 text-muted">${searchArray[i][0]}</button></td>`);
     $( "table" ).on( "click", "button", function( event ) {
       event.preventDefault();
       getWeatherInformation($(this).text());
       console.log("INDEX", index);
-      
-      ++index;
     })
-  })
+  }
 })
 
+// this is called twice
 let initializeLocalStorage = (() => {
   localStorage.setItem('searchHistory', '{}');
   console.log('LOCAL STORAGE', localStorage.getItem(searchHistory));
@@ -74,7 +107,6 @@ $('#city-search').click(() => {
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
   getWeatherInformation(citySearchString);
   addToSearchHistory(citySearchString, Date.now());
-  
 })
 
 $('input').keypress(event => {
@@ -147,7 +179,8 @@ let dateString = (unixTime => {
   return moment(unixTime).format('MM/DD/YYYY');
 })
 
-let showValuesOnPage = (() => { // this updates search history display, I think
+// PROBLEM HERE
+let showValuesOnPage = (() => {
   let searchString = cityName + ', ' + countryCode;
   $('#city-name').text(searchString + ' (' + dateString(Date.now()) + ')');
   // save "cityName + ', ' + countryCode" to local storage with the time stamp
