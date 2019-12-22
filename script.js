@@ -20,8 +20,8 @@ let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
 let searchHistory = {};
 
 $(document).ready(() => {
+  // localStorage.clear();
   console.log("DOCUMENT READY")
-  let searchHx = JSON.parse(localStorage.getItem('searchHistory'));
   renderSearchHistory();
 })
 
@@ -30,65 +30,21 @@ const renderSearchHistory = () => {
   if(searchHx) {
     arrayLength = searchHx.length;
     for(let i = 0; i < arrayLength; ++i) {
-      $(`#row${i}`).html(`<td><button class="recent${i} btn btn-link p-0 text-muted">${searchHx[i].searchString}</button></td>`);
-      $( "table" ).on( "click", "button", function( event ) {
-        event.preventDefault();
-        getWeatherInformation($(this).text());
-        console.log("INDEX", index);
-      })
+      $(`#row${i}`).html(`<td><button class="recent btn btn-link p-0 text-muted">${searchHx[i].searchString}</button></td>`);
     }
+    console.log("done with list setting loop");
   }
 }
+
+$( "table" ).on( "click", "button.recent", function() {
+  event.preventDefault();
+  getWeatherInformation($(this).text()); // this sends the whole array in
+  console.log("$(this).text()", $(this).text());
+});
 
 /* TODO:
-recentSearches = [obj{citySearch: "Portland, US", timeStamp: 0123973483}]
-1. validate the city name and if it's good, get the weather info from the APIs and update 
-2. If it's good, pull the array from local storage and search for the city name
-2a. If it's there, update the time stamp
-2b. If it's not there, add it to the array
-3. Sort the array by time stamp
-4. Delete the oldest (last) item from the array if there are more than ten items
-5. Update the recent searches list in the UI from the array
-6. Save the array to local storage (replace the existing one)
-searchHistory []
+Get rid of the duplicates
 */
-
-// display the last ten searches:
-let displaySearchHistory = searchHx => {
-  // localStorage.clear();
-  let index = 0;
-  console.log("searchhistory", searchHx);
-  // SORT HERE
-  searchHx.sort((a, b) => {
-    return a.timeStamp + b.timeStamp;
-  });
-
-  let arrayLength = searchHx.length;
-  // truncate search history if it's longer than ten - NOT WORKING
-  let result = ''
-  while(arrayLength > 10) {
-    console.log("ARRAY BEFORE POP", searchHx);
-    result = searchHx.pop();
-    console.log("POPPED", result);
-    console.log("ARRAY AFTER POP", searchHx);
-    arrayLength = searchHx.length;
-  }
-
-  // update local storage
-  // localStorage.clear();
-  console.log("::::::::Array NOW::::::::", searchHx);
-  localStorage.setItem(searchHistory, searchHx);
-
-  // display
-  for(let i = 0; i < arrayLength; ++i) {
-    $(`#row${i}`).html(`<td><button class="recent${i} btn btn-link p-0 text-muted">${searchHx[i].cityName}</button></td>`);
-    $( "table" ).on( "click", "button", function( event ) {
-      event.preventDefault();
-      getWeatherInformation($(this).text());
-      console.log("INDEX", index);
-    })
-  }
-}
 
 let initializeLocalStorage = (() => {
   localStorage.setItem('searchHistory', '[]');
@@ -214,7 +170,21 @@ const addToSearchHistory = (searchString, timeStamp) => {
   if(!searchHx) {
     searchHx = [];
   }
+
   searchHx.push(obj);
   console.log("search history after being added", searchHx);
+
+  searchHx.sort((b, a) => {
+    return a.timeStamp - b.timeStamp;
+  });
+  console.log("searchHx sorted", searchHx);
+
+  while(searchHx.length > 10) {
+    let popResult = searchHx.pop();
+    console.log("booting", popResult);
+  }
+  console.log("searchHx", searchHx);
+  console.log("local storage", JSON.parse(localStorage.getItem('searchHistory')));
+
   saveToLocalStorage(searchHx);
 }
