@@ -2,7 +2,7 @@
 
 Welcome to the weather dashboard application. Use this application to search for current weather conditions and the future weather outlook for multiple cities. 
 
-![Dashboard Screenshot](/assets/full_dashboard.png)
+![Dashboard Screenshot](/assets/weather_dash.png)
 
 * To search, enter the name of a city in the search bar, and click the search button or press return.
 ![Searching Screenshot](/assets/search_bar_and_history.png)
