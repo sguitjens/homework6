@@ -3,25 +3,21 @@ let cityLon = 0;
 let cityName = ''; // for getting the city name from the response, if needed
 let countryCode = '';
 let tempInK = 0;
-let currentTemp = 0;
-let maxTemp = 0;
-let minTemp = 0;
 let humidity = 0;
 let windSpeed = 0;
-let windDir = '';
 let uvIndex = 0;
-let iconName = ''
+let iconName = '';
 let iconURL= 'https://openweathermap.org/img/wn/';
 let weatherIcon = '';
 let weatherInfoRequestPrefix = 'https://api.openweathermap.org/data/2.5/';
 let fiveDayRequestPrefix = 'https://api.openweathermap.org/data/2.5/forecast?q='; // + &mode=json
 let uviQuery = 'uvi?'
-let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+// let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+const apiKey = "&appid=" + config.OW_API_KEY;
 let searchHistory = {};
 
 $(document).ready(() => {
   // localStorage.clear();
-  console.log("DOCUMENT READY")
   renderSearchHistory();
 })
 
@@ -32,23 +28,16 @@ const renderSearchHistory = () => {
     for(let i = 0; i < arrayLength; ++i) {
       $(`#row${i}`).html(`<td><button class="recent btn btn-link p-0 text-muted">${searchHx[i].searchString}</button></td>`);
     }
-    console.log("done with list setting loop");
   }
 }
 
 $( "table" ).on( "click", "button.recent", function() {
   event.preventDefault();
-  getWeatherInformation($(this).text()); // this sends the whole array in
-  console.log("$(this).text()", $(this).text());
+  getWeatherInformation($(this).text());
 });
-
-/* TODO:
-Get rid of the duplicates
-*/
 
 let initializeLocalStorage = (() => {
   localStorage.setItem('searchHistory', '[]');
-  console.log('LOCAL STORAGE', localStorage.getItem(searchHistory));
 });
 
 $('#city-search').click(() => {
@@ -166,25 +155,30 @@ const addToSearchHistory = (searchString, timeStamp) => {
     "timeStamp": timeStamp
   }
   let searchHx = JSON.parse(localStorage.getItem('searchHistory'));
-  console.log("search history before being added", searchHx);
   if(!searchHx) {
     searchHx = [];
   }
 
-  searchHx.push(obj);
-  console.log("search history after being added", searchHx);
+  let len = searchHx.length;
+  let inArray = false;
+  for(let i = 0; i < len; ++i) {
+    if(searchHx[i].searchString === obj.searchString) {
+      searchHx[i].timeStamp = obj.timeStamp;
+      inArray = true;
+    }
+  }
+
+  if(inArray === false) {
+    searchHx.push(obj);
+  }
 
   searchHx.sort((b, a) => {
     return a.timeStamp - b.timeStamp;
   });
-  console.log("searchHx sorted", searchHx);
 
   while(searchHx.length > 10) {
     let popResult = searchHx.pop();
-    console.log("booting", popResult);
   }
-  console.log("searchHx", searchHx);
-  console.log("local storage", JSON.parse(localStorage.getItem('searchHistory')));
 
   saveToLocalStorage(searchHx);
 }
