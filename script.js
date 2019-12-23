@@ -3,110 +3,47 @@ let cityLon = 0;
 let cityName = ''; // for getting the city name from the response, if needed
 let countryCode = '';
 let tempInK = 0;
-let currentTemp = 0;
-let maxTemp = 0;
-let minTemp = 0;
 let humidity = 0;
 let windSpeed = 0;
-let windDir = '';
 let uvIndex = 0;
-let iconName = ''
+let iconName = '';
 let iconURL= 'https://openweathermap.org/img/wn/';
 let weatherIcon = '';
 let weatherInfoRequestPrefix = 'https://api.openweathermap.org/data/2.5/';
 let fiveDayRequestPrefix = 'https://api.openweathermap.org/data/2.5/forecast?q='; // + &mode=json
 let uviQuery = 'uvi?'
-let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+// let apiKey = '&appid=d5063d29f50830106cfbe3f17f54053f'
+const apiKey = "&appid=" + config.OW_API_KEY;
 let searchHistory = {};
 
 $(document).ready(() => {
-  console.log("DOCUMENT READY")
-  updateSearchHistory();
-})
-
-// TODO: fix sort order
-// TODO: fix truncation of array
-// TODO: add config.js to protect api key
-
-// gets the search history from local storage and displays its contents
-// initializes it if it doesn't exist
-// creates an array of items and calls the function to display them
-let updateSearchHistory = (() => {
   // localStorage.clear();
-  const searchHistoryObject = JSON.parse(localStorage.getItem('searchHistory'));
-  console.log("searchHistoryObject", searchHistoryObject);
-  if(searchHistoryObject === null) {
-    initializeLocalStorage();
-  } else {
-    console.log("SEARCH HISTORY OBJECT", searchHistoryObject);
-    const searchHistoryArray = [];
-
-    for (let [key, value] of Object.entries(searchHistoryObject)) {
-      // console.log([`${key}`, `${value}`]);
-      searchHistoryArray.push([`${key}`, `${value}`]); 
-    }
-    console.log("SEARCH HISTORY ARRAY", searchHistoryArray);
-    if(searchHistoryArray) {
-      displaySearchHistory(searchHistoryArray);
-      console.log("DISPLAYING SEARCH HISTORY");
-    }
-  }
+  renderSearchHistory();
 })
 
-// display the last ten searches: I think this might be where there are problems
-let displaySearchHistory = (searchArray => {
-  let index = 0;
-  console.log("ARRAY FOREACH ISSUE", searchArray);
-  // SORT HERE
-  searchArray.sort((a, b) => {
-    // console.log("a", a);
-    // console.log("b", b);
-    return a[1] + b[1];
-  })
-
-  let arrayLength = searchArray.length;
-  // TRUNCATE HERE
-  // if(arrayLength > 10) {
-    let result = ''
-  while(arrayLength > 10) {
-    console.log("ARRAY BEFORE POP", searchArray);
-    result = searchArray.pop();
-    console.log("POPPED", result);
-    console.log("ARRAY AFTER POP", searchArray);
-    arrayLength = searchArray.length;
+const renderSearchHistory = () => {
+  let searchHx = JSON.parse(localStorage.getItem('searchHistory'));
+  if(searchHx) {
+    arrayLength = searchHx.length;
+    for(let i = 0; i < arrayLength; ++i) {
+      $(`#row${i}`).html(`<td><button class="recent btn btn-link p-0 text-muted">${searchHx[i].searchString}</button></td>`);
+    }
   }
+}
 
-  //update in local storage?????????????????????
-  // clear local storage and put this item in instead
-  localStorage.clear();
-  let obj = Object.fromEntries(searchArray);
-  console.log("::::::::OBJECT NOW::::::::", obj);
-  localStorage.setItem(searchHistory, obj);
+$( "table" ).on( "click", "button.recent", function() {
+  event.preventDefault();
+  getWeatherInformation($(this).text());
+});
 
- 
-
-  // display
-  for(let i = 0; i < arrayLength; ++i) {
-    $(`#row${i}`).html(`<td><button class="recent${i} btn btn-link p-0 text-muted">${searchArray[i][0]}</button></td>`);
-    $( "table" ).on( "click", "button", function( event ) {
-      event.preventDefault();
-      getWeatherInformation($(this).text());
-      console.log("INDEX", index);
-    })
-  }
-})
-
-// this is called twice
 let initializeLocalStorage = (() => {
-  localStorage.setItem('searchHistory', '{}');
-  console.log('LOCAL STORAGE', localStorage.getItem(searchHistory));
+  localStorage.setItem('searchHistory', '[]');
 });
 
 $('#city-search').click(() => {
   event.preventDefault();
   let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
   getWeatherInformation(citySearchString);
-  addToSearchHistory(citySearchString, Date.now());
 })
 
 $('input').keypress(event => {
@@ -114,7 +51,6 @@ $('input').keypress(event => {
     event.preventDefault();
     let citySearchString = validatedSearchString($('input').attr("placeholder", "City Name").val());
     getWeatherInformation(citySearchString);
-    addToSearchHistory(citySearchString, Date.now());
   }
 })
 
@@ -179,12 +115,11 @@ let dateString = (unixTime => {
   return moment(unixTime).format('MM/DD/YYYY');
 })
 
-// PROBLEM HERE
 let showValuesOnPage = (() => {
   let searchString = cityName + ', ' + countryCode;
   $('#city-name').text(searchString + ' (' + dateString(Date.now()) + ')');
-  // save "cityName + ', ' + countryCode" to local storage with the time stamp
   addToSearchHistory(searchString, Date.now());
+  renderSearchHistory();
   $('#weather-icon').attr('src', iconURL + iconName + '.png')
   $('#temp-data').text('Temperature: ' + 
     (tempInK - 273.15).toFixed(2) + ' ' + String.fromCharCode(176) + 'C (' +
@@ -209,20 +144,41 @@ let setFiveDayData = (response => {
   }
 })
 
-let saveToLocalStorage = (searchesObj => {
-  return localStorage.setItem('searchHistory', JSON.stringify(searchesObj));
+// TODO: make searchesObj into an array instead of an object
+let saveToLocalStorage = (searchHx => {
+  return localStorage.setItem('searchHistory', JSON.stringify(searchHx));
 });
 
-let addToSearchHistory = ((searchString, timeStamp) => {
-  if(!localStorage.getItem('searchHistory')) {
-    initializeLocalStorage();
+const addToSearchHistory = (searchString, timeStamp) => {
+  let obj = {
+    "searchString": searchString,
+    "timeStamp": timeStamp
+  }
+  let searchHx = JSON.parse(localStorage.getItem('searchHistory'));
+  if(!searchHx) {
+    searchHx = [];
   }
 
-  let searchHistory = JSON.parse(localStorage.getItem('searchHistory'));
-  console.log('search history object before addition', searchHistory);
+  let len = searchHx.length;
+  let inArray = false;
+  for(let i = 0; i < len; ++i) {
+    if(searchHx[i].searchString === obj.searchString) {
+      searchHx[i].timeStamp = obj.timeStamp;
+      inArray = true;
+    }
+  }
 
-  searchHistory[searchString] = timeStamp;
-  console.log('search history object AFTER addition', searchHistory);
+  if(inArray === false) {
+    searchHx.push(obj);
+  }
 
-  saveToLocalStorage(searchHistory);
-});
+  searchHx.sort((b, a) => {
+    return a.timeStamp - b.timeStamp;
+  });
+
+  while(searchHx.length > 10) {
+    let popResult = searchHx.pop();
+  }
+
+  saveToLocalStorage(searchHx);
+}
